@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domains>
+	<gaming>
+		<name>win-gaming-0</name>
+		<description>Gaming session with gtx 1060. </description>
+		<address>10.0.10.80</address>
+		<status occupied="0">
+			<owner></owner>
+			<!-- heartbeats inside server! -->
+		</status>
+	</gaming>
+	<gaming>
+		<name>win-gaming-1</name>
+		<description>Gaming session with gtx 970. </description>
+		<address>10.0.10.81</address>
+		<status occupied="0">
+			<owner></owner>
+			<!-- heartbeats inside server! -->
+		</status>
+	</gaming>
+	<work>
+		<name>win10-psm</name>
+		<description>Work session configured for PSM. Prepared for conference.</description>
+		<address>10.0.10.89</address>
+		<status occupied="0">
+			<owner></owner>
+			<!-- heartbeats inside server! -->
+		</status>
+	</work>
+</domains>
