@@ -4,8 +4,8 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 #VisualStudio Python project files
-*.sln
-*.pyproj
+.sln
+.pyproj
 [__]pycache__/
 
 # User-specific files
