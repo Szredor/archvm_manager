@@ -5,8 +5,6 @@ import xml.etree.ElementTree as ET
 
 
 # prototyp klasy domena
-
-
 class Domain():
     def __init__(self, isGaming, name, description, address, status):
         self.isGaming = isGaming
@@ -20,8 +18,6 @@ class Domain():
 
 
 # prototypowe definicje funkcji
-
-
 def updateDomains(filename):
     domains = ET.parse(filename).getroot().getchildren()
     updatedDomains = []
@@ -49,7 +45,6 @@ def createXmlMessage(domainList, filename): # zalazek
 
 
 # testy funkcji 
-
 testdomainList = (updateDomains('vms.xml'))
 printDomainList(testdomainList)
 createXmlMessage(testdomainList, 'test.xml')
