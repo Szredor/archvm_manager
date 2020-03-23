@@ -20,6 +20,9 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="domain_status.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="sockets.py">
       <SubType>Code</SubType>
     </Compile>

@@ -2,10 +2,18 @@
 
 import threading
 import time
+import socket
+
 import xml_parsing
+import sockets
 import libvirt
 
 HEARTBEATS_LOSS = 3
+HEARTBEAT_CYCLE = 60
+
+
+
+
 
 class HypervisorConnect():
 
@@ -45,35 +53,35 @@ class HypervisorConnect():
         except libvirt.libvirtError as e:
             print(e.get_error_message())
         print ("Hypervisor connection closed")
-            
 
 #Thread to increment and expropriate domain if neccesary
 def heartbeatIncrementWorker(domainsStatus, domainsLock):
-    time.sleep(60)
+    while True:
+        time.sleep(HEARTBEAT_CYCLE)
+        
+        #critical section to increment heartbetConters in domainsStatus list
+        domainsLock.acquire()
+        for dom in domainsStatus:
+            if dom.status.occupied:
+                dom.status.heartbeatCounter = dom.status.heartbeatCounter + 1
+                if dom.status.heartbeatCounter > HEARTBEATS_LOSS:
+                    markNotUsing(dom)
 
-    #critical section to increment heartbetConters in domainsStatus list
-    domainsLock.acquire()
-    for dom in domainsStatus:
-        if dom.status:
-            dom.heartbeatCounter = dom.heartbeatCounter + 1
-            if dom.status.heartbeatCountser > HEARTBEATS_LOSS:
-                #dom.owner
-                pass
-
-    domainsLock.release()
+        domainsLock.release()
 
 #Intilizes connection with hypervisor, create heartbeat thread and creates lock
-def prepareToWork(domainsStatus) -> bool:
+def prepareToWork(domainsStatus, config) -> bool:
     global hyper
     global domainsLock
 
-    hyper = HypervisorConnect('qemu:///system')
-    if hyper.isCriticalError:
+    hyper = HypervisorConnect(config['VIRTUALIZATION']['HYPERVISOR_URI'])
+    if hyper.isCriticalError():
         return False
 
     domainsLock = threading.Lock()
 
-    threading.Thread(target=heartbeatIncrementWorker, args=(domainsStatus, domainsLock), daemon=True)
+    th = threading.Thread(target=heartbeatIncrementWorker, args=(domainsStatus, domainsLock), daemon=True)
+    th.start()
     return True
 
 
@@ -81,59 +89,129 @@ def closeHypervisor() -> None:
     global hyper
 
     hyper.disconnect()
+    pass
 
-def isInUse(domainsList, name):
-    for dom in domainsList:
+def getDomain(domainList, name) -> xml_parsing.Domain:
+    for dom in domainList:
         if dom.name == name:
-            return dom.status
-    raise LookupError("Domain not found")
+            return dom
+    return None
 
-def domainExists(domainsList, name):
-    for dom in domainsList:
-        if dom.name == name:
-            return True
+def markUsing(dom, owner) -> bool:
+    if not dom.status.occupied:
+        dom.status.owner = owner
+        dom.status.occupied = True
+        dom.status.heartbeatCounter = 0
+        return True
     return False
 
-def markUsing(domainList, name, owner):
-    for dom in domainsList:
-        if dom.name == name:
-            if not dom.status.occupied:
-                dom.status.owner = owner
-                dom.status.occupied = True
-                return true
-            else:
-                return False
+def markNotUsing(dom) -> bool:
+    if dom.status.occupied:
+        dom.status.owner = ''
+        dom.status.occupied = False
+        return True
     return False
             
 
-def updateDomainsStatus(domainsList) -> None:
-    for dom in domainsList:
+def updateDomainsStatus(domainList) -> None:
+    domainsLock.acquire()
+    for dom in domainList:
         dom.status.isRunning = hyper.check_running(dom.name)
+        pass
+    domainsLock.release()
 
-#to do
-def connectHandle(data, domainsList, sock, owner) -> str:
+
+#checks considtions and mark as occupied if all are right
+def connectHandle(data, domainList, sock, owner) -> str:
     name = data.decode(encoding='utf-8')
+
+    domainsLock.acquire()
+    dom = getDomain(domainList, name)
+    if dom is None:
+        domainsLock.release()
+        return f'Domain {name} does not exist'
+
+    dom.status.isRunning = True
+    if not dom.status.isRunning:
+        domainsLock.release()
+        return f'Domain {name} does not work'
+
+    if not markUsing(dom, owner):
+        domainsLock.release()
+        return f'Domain {name} is not occupied'
+
+    try:
+        sockets.writeSocket(sock, (chr(sockets.CONNECT) + 'OK').encode(encoding='utf-8'))
+    except socket.timeout as err:
+        markNotUsing(dom)
+    domainsLock.release()
     
 #to do
-def disconnectHandle(data, domainsList, sock, owner) -> str:
-    pass
-#to do
-def heartbeatHandle(data, domainsList, sock, owner) -> str:
-    pass
+def disconnectHandle(data, domainList, sock, owner) -> str:
+    name = data.decode(encoding='utf-8')
 
-#test it!!!
-def changeToNewDomains(domainsList, newList):
+    domainsLock.acquire()
+    dom = getDomain(domainList, name)
+    if dom is None:
+        domainsLock.release()
+        return f'Domain {name} does not exist'
+
+    if not dom.status.isRunning:
+        domainsLock.release()
+        return f'Domain {name} does not work'
+
+    if not markNotUsing(dom):
+        domainsLock.release()
+        return f'Domain {name} is already occupied'
+    domainsLock.release()
+
+    try:
+        sockets.writeSocket(sock, (chr(sockets.DISCONNECT) + 'OK').encode(encoding='utf-8'))
+    except socket.timeout as err:
+        pass
+#to do
+def heartbeatHandle(data, domainList, sock, owner) -> str:
+    name = data.decode(encoding='utf-8')
+
+    domainsLock.acquire()
+    dom = getDomain(domainList, name)
+    if dom is None:
+        domainsLock.release()
+        return f'Domain {name} does not exist'
+
+    if not dom.status.isRunning:
+        domainsLock.release()
+        return f'Domain {name} does not work'
+
+    if not dom.status.occupied:
+        domainsLock.release()
+        return f'Domain {name} is not occupied'
+
+    if not dom.status.owner == owner:
+        domainsLock.release()
+        return f'Domain {name} is not your property'
+
+    dom.status.heartbeatCounter = 0
+    domainsLock.release()
+
+    try:
+        sockets.writeSocket(sock, (chr(sockets.HEARTBEAT) + 'OK').encode(encoding='utf-8'))
+    except socket.timeout as err:
+        pass
+
+
+def changeToNewDomains(domainList, newList):
     global domainsLock
 
     domainsLock.acquire()
 
     for tDom in newList:
-        for d in domainsList:
+        for d in domainList:
             if d.name == tDom.name:
                 d.status.copyStatus(tDom.status)
     
-    domainsList.clear()
+    domainList.clear()
     for tDom in newList:
-        domainsList.append(tDom)
+        domainList.append(tDom)
 
     domainsLock.release()

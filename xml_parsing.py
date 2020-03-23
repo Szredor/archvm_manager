@@ -9,13 +9,18 @@ class Status():
         self.occupied = occupied
         self.owner = owner
         self.isRunning = isRunning
+        self.heartbeatCounter = 0
     def __repr__(self):
-        return f'occupied: {self.occupied}, owner: {self.owner}, is running: {self.isRunning}'
+        return f'occupied: {self.occupied}, owner: {self.owner}, is running: {self.isRunning}, heartbeatCounter: {self.heartbeatCounter}'
+
     def printUser():
-        pass
+        raise NotImplementedError()
+
     def copyStatus(self, other):
-        for member in self:
-            other.member = self.member
+        other.occupied = self.occupied
+        other.owner = self.owner
+        other.isRunning = self.isRunning
+        other.heartbeatCounter = self.heartbeatCounter
 
 
 
@@ -27,11 +32,12 @@ class Domain():
         self.description = description
         self.address = address
         self.status = status
-        self.heartbeatCounter = 0
+
     def __repr__(self):
-        return f'is gaming: {str(self.isGaming)}\n name: {self.name}\n description: {self.description}\n address: {self.address}\n status: {self.status}\n'
+        return f'is gaming: {str(self.isGaming)}\n name: {self.name}\n description: {self.description}\n address: {self.address}\n status: \n{self.status}'
+
     def printUser(self):
-        pass
+        raise NotImplementedError()
 
 
 #wczytuje poczatkowy stan domen z pliku
@@ -53,13 +59,13 @@ def importDomains(filename):
 
 
 #wypisuje domeny na ekranie 
-def printDomainsList(domainList):
+def printdomainList(domainList):
     for domain in domainList:
         print(domain)
 
 
 #Tworzy string z xmlem do wyslania z listy domen bez czytania z pliku
-def createXmlMessage(domainsList): # zalazek
+def createXmlMessage(domainList): # zalazek
     testDomain = Domain(True, 'test', 'test', '111', Status(True, 'test', True))
     messageString = '<?xml version="1.0" encoding="UTF-8"?>'
     return messageString
@@ -68,8 +74,21 @@ def createXmlMessage(domainsList): # zalazek
 
 if __name__ == '__main__':
     # testy funkcji 
-    testdomainList = importDomains('vms.xml')
-    printDomainsList(testdomainList)
+    testdomainList = importDomains('docs/vms.xml')
+    printdomainList(testdomainList)
     #createXmlMessage(testdomainList)
+
+    ones = Status(0, 'siema', 1)
+    twos = Status(0, 'drugi', 0)
+    twos.heartbeatCounter = 2
+
+    print(ones)
+    print(twos)
+
+    ones.copyStatus(twos)
+
+    print(ones)
+    print(twos)
+
     print("press any key to continue...")
     input()

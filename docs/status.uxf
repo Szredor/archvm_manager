@@ -7,10 +7,11 @@
       <x>390</x>
       <y>30</y>
       <w>210</w>
-      <h>150</h>
+      <h>170</h>
     </coordinates>
     <panel_attributes>Domain
 --
+-isGaming: bool
 -name: str
 -description: str
 -address: str

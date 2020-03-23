@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- TEMPLATE
+
+	<gaming OR work>
+		<name>SET_NAME</name>
+		<description>SET_DESCRIPTION</description>
+		<address>SET_ADDRESS</address>
+		<status occupied="0">
+			<owner></owner>
+			<is-running>0</is-running>
+		</status>
+	</gaming OR work>
+
+-->
+<domains>
+	<work>
+		<name>win10-psm</name>
+		<description>Work session configured for PSM. Prepared for conference.</description>
+		<address>10.0.10.89</address>
+		<status occupied="0">
+			<owner></owner>
+			<is-running>0</is-running>
+			<!-- heartbeats inside server! -->
+		</status>
+	</work>
+</domains>
