@@ -7,6 +7,7 @@ import socket
 import xml_parsing
 import configparser
 import sockets
+import domain_status
 
 #configFile = '/etc/archvm_manager'
 configFile = 'test.conf'
@@ -33,20 +34,29 @@ def handleCommands(sock, domainsList, config) -> None:
         cmd = data[0]
 
         if cmd == sockets.CONNECT:
-            connectHandle(data[1:], domainsList)
+            erText = connectHandle(data[1:], domainsList, client_sock, address[0])
+            if not erText == '':
+                sockets.sendError(sock, erText)
         elif cmd == sockets.DISCONNECT:
-            disconnectHandle(data[1:], domainsList)
+            erText = disconnectHandle(data[1:], domainsList, client_sock, address[0])
+            if not erText == '':
+                sockets.sendError(sock, erText)
         elif cmd == sockets.HEARTBEAT:
-            heartbeatHandle(data[1:], domainsList)
+            erText = heartbeatHandle(data[1:], domainsList, client_sock, address[0])
+            if not erText == '':
+                sockets.sendError(sock, erText)
         elif cmd == sockets.REFRESH:
-            #domainsList = updateDomainsStatus(domainsList)
+            updateDomainsStatus(domainsList)
             try:
-                sockets.writeSocket(client_sock, (chr(sockets.REFRESH) + sockects.createXmlMessage(domainsList)).encode(encoding='utf-8'))
+                sockets.writeSocket(client_sock, (chr(sockets.REFRESH) + sockets.createXmlMessage(domainsList)).encode(encoding='utf-8'))
             except socket.timeout as err:
                 print (f'Timeout exceeded when trying to send REFRESH data to', address[0])
+        #reloads config file and imports domains from file
         elif cmd == sockets.RELOAD:
             config.read(configFile)
-            pass
+            temp = xml_parsing.importDomains(config['CONSTANTS']['VMS_XML_PATH'])
+            domain_status.appendNewDomains(domainsList, temp)
+        #stops server if and only if STOP command comes from server address
         elif cmd == sockets.STOP:
             if sock.getsockname()[0] == address[0]:
                 working = False
@@ -58,9 +68,9 @@ def handleCommands(sock, domainsList, config) -> None:
 def main():
     config = configparser.ConfigParser()
     config.read(configFile)
-    #domain_list = xml_parsing.importDomains(config['CONSTANTS']['VMS_XML_PATH'])
-    #domainsList = domain_status.updateDomainsStatus(domainsList)
-    domainsList = ''
+    domainsList = xml_parsing.importDomains(config['CONSTANTS']['VMS_XML_PATH'])
+    domain_status.prepareToWork(domainsList)
+    domain_status.updateDomainsStatus(domainsList)
     
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     p = int(config['CONSTANTS']['PORT'])
@@ -71,6 +81,7 @@ def main():
     handleCommands(sock, domainsList, config)
 
     sock.close()
+    domain_status.closeHypervisor()
     print("server down")
 
 
