@@ -41,6 +41,13 @@ def writeSocket(sock, data) -> int:
     sock.sendall(payload)
     return msgsize
 
+def sendError(sock, text) -> None:
+    payload = (chr(ERROR) + text).encode(encoding='utf-8')
+    try:
+        writeSocket(sock, payload)
+    except socket.timeout as err:
+        pass
+
 
 
 

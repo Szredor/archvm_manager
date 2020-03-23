@@ -11,7 +11,7 @@ import sockets
 #configFile = '/etc/archvm_manager'
 configFile = 'test.conf'
 
-def handleCommands(sock, domainsList, config):
+def handleCommands(sock, domainsList, config) -> None:
     working = True
 
     while working:
@@ -40,7 +40,10 @@ def handleCommands(sock, domainsList, config):
             heartbeatHandle(data[1:], domainsList)
         elif cmd == sockets.REFRESH:
             #domainsList = updateDomainsStatus(domainsList)
-            pass
+            try:
+                sockets.writeSocket(client_sock, (chr(sockets.REFRESH) + sockects.createXmlMessage(domainsList)).encode(encoding='utf-8'))
+            except socket.timeout as err:
+                print (f'Timeout exceeded when trying to send REFRESH data to', address[0])
         elif cmd == sockets.RELOAD:
             config.read(configFile)
             pass
@@ -55,8 +58,8 @@ def handleCommands(sock, domainsList, config):
 def main():
     config = configparser.ConfigParser()
     config.read(configFile)
-    #domain_list = xml_parsing.import_xml(config['CONSTANTS']['VMS_XML_PATH'])
-    #domainsList = updateDomainsStatus(domainsList)
+    #domain_list = xml_parsing.importDomains(config['CONSTANTS']['VMS_XML_PATH'])
+    #domainsList = domain_status.updateDomainsStatus(domainsList)
     domainsList = ''
     
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
