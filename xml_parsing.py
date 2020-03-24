@@ -54,7 +54,6 @@ def importDomains(filename):
                 status = Status(bool(child.attrib.get('occupied') == '1'), child[0].text, bool(child[1].text == '1'))
                 domainInitList.append(status)         
         importedDomains.append(Domain(*domainInitList))
-
     return importedDomains
 
 
@@ -66,17 +65,42 @@ def printdomainList(domainList):
 
 #Tworzy string z xmlem do wyslania z listy domen bez czytania z pliku
 def createXmlMessage(domainList): # zalazek
-    testDomain = Domain(True, 'test', 'test', '111', Status(True, 'test', True))
-    messageString = '<?xml version="1.0" encoding="UTF-8"?>'
-    return messageString
+    messageString = b'<?xml version="1.0" encoding="UTF-8"?>'
+    messageBuilder = ET.TreeBuilder()
+    messageBuilder.start('domains')
+    for domain in domainList:
+        if domain.isGaming:
+            messageBuilder.start('gaming',{})
+        else:
+            messageBuilder.start('work',{})
+        messageBuilder.start('name',{}).text = domain.name
+        messageBuilder.end('name')
+        messageBuilder.start('description',{}).text = domain.description
+        messageBuilder.end('description')
+        messageBuilder.start('address',{}).text = domain.address
+        messageBuilder.end('address')
+        messageBuilder.start('status', {'occupied': str(int(domain.status.occupied))})
+        messageBuilder.start('owner',{}).text = domain.status.owner
+        messageBuilder.end('owner')
+        messageBuilder.start('is-running',{}).text = str(int(domain.status.isRunning))
+        messageBuilder.end('is-running')
+        messageBuilder.end('status')
+        if domain.isGaming:
+            messageBuilder.end('gaming')
+        else:
+            messageBuilder.end('work')
+    message = messageBuilder.end('domains')
+    return str(messageString + ET.tostring(message))
     
+
 
 
 if __name__ == '__main__':
     # testy funkcji 
     testdomainList = importDomains('docs/vms.xml')
-    printdomainList(testdomainList)
-    #createXmlMessage(testdomainList)
+    #printdomainList(testdomainList)
+    print(createXmlMessage(testdomainList))
+
 
     ones = Status(0, 'siema', 1)
     twos = Status(0, 'drugi', 0)
