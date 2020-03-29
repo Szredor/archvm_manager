@@ -55,7 +55,7 @@ def handleCommands(sock, domainList, config) -> None:
         elif cmd == sockets.REFRESH:
             domain_status.updateDomainsStatus(domainList)
             try:
-                sockets.writeSocket(client_sock, (chr(sockets.REFRESH) + xml_parsing.createXmlMessage(domainList)).encode(encoding='utf-8'))
+                sockets.writeSocket(client_sock, chr(sockets.REFRESH).encode(encoding='utf-8') + xml_parsing.createXmlMessage(domainList))
             except socket.timeout as err:
                 print (f'Timeout exceeded when trying to send REFRESH data to', address[0])
         #reloads config file and imports domains from file
@@ -75,7 +75,6 @@ def handleCommands(sock, domainList, config) -> None:
         else:
             print ("Wrong packet from", address, "data:", data)
         client_sock.close()
-        #xml_parsing.printdomainList(domainList)
 
 def main():
     config = configparser.ConfigParser()
@@ -94,8 +93,6 @@ def main():
     sock.close()
     domain_status.closeHypervisor()
     print("server down")
-
-
 
 if __name__ == '__main__':
     main()

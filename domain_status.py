@@ -6,17 +6,12 @@ import socket
 
 import xml_parsing
 import sockets
-import libvirt
+#import libvirt
 
 HEARTBEATS_LOSS = 3
 HEARTBEAT_CYCLE = 60
 
-
-
-
-
 class HypervisorConnect():
-
     def __init__(self, hypervisorURI):
         self.__conn = self.__conn_hypervisor(hypervisorURI)
         if self.__conn is None:
@@ -53,6 +48,7 @@ class HypervisorConnect():
         except libvirt.libvirtError as e:
             print(e.get_error_message())
         print ("Hypervisor connection closed")
+        
 
 #Thread to increment and expropriate domain if neccesary
 def heartbeatIncrementWorker(domainsStatus, domainsLock):
@@ -70,8 +66,9 @@ def heartbeatIncrementWorker(domainsStatus, domainsLock):
         domainsLock.release()
 
 #Intilizes connection with hypervisor, create heartbeat thread and creates lock
+#Returns True on success, False otherwise. 
 def prepareToWork(domainsStatus, config) -> bool:
-    global hyper
+    #global hyper
     global domainsLock
 
     hyper = HypervisorConnect(config['VIRTUALIZATION']['HYPERVISOR_URI'])
@@ -84,20 +81,28 @@ def prepareToWork(domainsStatus, config) -> bool:
     th.start()
     return True
 
-
+#closes connection with chosen hypervisor
 def closeHypervisor() -> None:
     global hyper
 
     hyper.disconnect()
     pass
 
+#Get status of domain. It's a reference to proper status of domain inside this software.
+#It can be falsified when uses without caution.
+#Returns Domain type on success, None otherwise.
 def getDomain(domainList, name) -> xml_parsing.Domain:
     for dom in domainList:
         if dom.name == name:
             return dom
     return None
 
+#Marks domain as using by owner (owner's address)
+#Returns True on success, False otherwise.
 def markUsing(dom, owner) -> bool:
+    if dom.status.occupied and dom.status.owner == owner:
+        return True
+
     if not dom.status.occupied:
         dom.status.owner = owner
         dom.status.occupied = True
@@ -105,6 +110,8 @@ def markUsing(dom, owner) -> bool:
         return True
     return False
 
+#Marks domain as using by owner (owner's address)
+#Returns True on success, False otherwise.
 def markNotUsing(dom) -> bool:
     if dom.status.occupied:
         dom.status.owner = ''
@@ -121,7 +128,9 @@ def updateDomainsStatus(domainList) -> None:
     domainsLock.release()
 
 
-#checks considtions and mark as occupied if all are right
+#Checks conditions and mark as occupied if all are right
+#Returns str if error occured with error message. It is intented sending it to client.
+#Return None otherwise.
 def connectHandle(data, domainList, sock, owner) -> str:
     name = data.decode(encoding='utf-8')
 
@@ -138,7 +147,7 @@ def connectHandle(data, domainList, sock, owner) -> str:
 
     if not markUsing(dom, owner):
         domainsLock.release()
-        return f'Domain {name} is not occupied'
+        return f'Domain {name} is already occupied'
 
     try:
         sockets.writeSocket(sock, (chr(sockets.CONNECT) + 'OK').encode(encoding='utf-8'))
@@ -146,7 +155,9 @@ def connectHandle(data, domainList, sock, owner) -> str:
         markNotUsing(dom)
     domainsLock.release()
     
-#to do
+#Checks conditions and mark as not occupied if all are right
+#Returns str if error occured with error message. It is intented sending it to client.
+#Return None otherwise.
 def disconnectHandle(data, domainList, sock, owner) -> str:
     name = data.decode(encoding='utf-8')
 
@@ -162,14 +173,18 @@ def disconnectHandle(data, domainList, sock, owner) -> str:
 
     if not markNotUsing(dom):
         domainsLock.release()
-        return f'Domain {name} is already occupied'
+        return f'Domain {name} is not occupied'
     domainsLock.release()
 
     try:
         sockets.writeSocket(sock, (chr(sockets.DISCONNECT) + 'OK').encode(encoding='utf-8'))
     except socket.timeout as err:
         pass
-#to do
+    return None
+
+#Zeros a heartbeatCounter for domains. It is used to check if client is still on the other side. 
+#Returns str if error occured with error message. It is intented sending it to client.
+#Return None otherwise.
 def heartbeatHandle(data, domainList, sock, owner) -> str:
     name = data.decode(encoding='utf-8')
 
@@ -198,8 +213,10 @@ def heartbeatHandle(data, domainList, sock, owner) -> str:
         sockets.writeSocket(sock, (chr(sockets.HEARTBEAT) + 'OK').encode(encoding='utf-8'))
     except socket.timeout as err:
         pass
+    return None
 
-
+#Reloads data about virtual machines configured in XML file.
+#Copies status of every still exeisting domains.
 def changeToNewDomains(domainList, newList):
     global domainsLock
 

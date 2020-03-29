@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{ee99c455-c19e-4e0a-9748-e3a76f226fc5}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>server.py</StartupFile>
+    <StartupFile>client.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -19,7 +19,16 @@
   <PropertyGroup>
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Server' ">
+    <OutputPath>bin\Server\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Client' ">
+    <OutputPath>bin\Client\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
+    <Compile Include="client_messages.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="domain_status.py">
       <SubType>Code</SubType>
     </Compile>

@@ -7,12 +7,16 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "archvm_manager", "archvm_ma
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Client|Any CPU = Client|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Server|Any CPU = Server|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE99C455-C19E-4E0A-9748-E3A76F226FC5}.Client|Any CPU.ActiveCfg = Client|Any CPU
 		{EE99C455-C19E-4E0A-9748-E3A76F226FC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EE99C455-C19E-4E0A-9748-E3A76F226FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE99C455-C19E-4E0A-9748-E3A76F226FC5}.Server|Any CPU.ActiveCfg = Server|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

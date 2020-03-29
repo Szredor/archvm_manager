@@ -2,8 +2,6 @@
 
 import xml.etree.ElementTree as ET
 
-
-
 class Status():
     def __init__(self, occupied, owner, isRunning):
         self.occupied = occupied
@@ -22,8 +20,6 @@ class Status():
         other.isRunning = self.isRunning
         other.heartbeatCounter = self.heartbeatCounter
 
-
-
 # prototyp klasy domena
 class Domain():
     def __init__(self, isGaming, name, description, address, status):
@@ -38,7 +34,6 @@ class Domain():
 
     def printUser(self):
         raise NotImplementedError()
-
 
 #wczytuje poczatkowy stan domen z pliku
 def importDomains(filename):
@@ -56,15 +51,29 @@ def importDomains(filename):
         importedDomains.append(Domain(*domainInitList))
     return importedDomains
 
+#wczytuje poczatkowy stan domen ze stringa
+def importDomainsFromString(data):
+    importedDomains = []
+    domains = ET.fromstring(data)
+    for domain in domains:
+        domainInitList = []
+        domainInitList.append(bool(domain.tag == 'gaming'))
+        for child in domain:
+            if child.tag  != 'status':
+                domainInitList.append(child.text)
+            else:
+                status = Status(bool(child.attrib.get('occupied') == '1'), child[0].text, bool(child[1].text == '1'))
+                domainInitList.append(status)         
+        importedDomains.append(Domain(*domainInitList))
+    return importedDomains
 
 #wypisuje domeny na ekranie 
 def printdomainList(domainList):
     for domain in domainList:
         print(domain)
 
-
 #Tworzy string z xmlem do wyslania z listy domen bez czytania z pliku
-def createXmlMessage(domainList): # zalazek
+def createXmlMessage(domainList):
     messageString = b'<?xml version="1.0" encoding="UTF-8"?>'
     messageBuilder = ET.TreeBuilder()
     messageBuilder.start('domains')
@@ -90,17 +99,14 @@ def createXmlMessage(domainList): # zalazek
         else:
             messageBuilder.end('work')
     message = messageBuilder.end('domains')
-    return str(messageString + ET.tostring(message))
-    
-
-
+    return messageString + ET.tostring(message)
 
 if __name__ == '__main__':
     # testy funkcji 
     testdomainList = importDomains('docs/vms.xml')
-    #printdomainList(testdomainList)
-    print(createXmlMessage(testdomainList))
-
+    printdomainList(testdomainList)
+    s = createXmlMessage(testdomainList)
+    print(s)
 
     ones = Status(0, 'siema', 1)
     twos = Status(0, 'drugi', 0)
