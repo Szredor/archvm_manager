@@ -3,6 +3,8 @@
 #Main server command loop
 
 import socket
+import signal
+import time
 
 import xml_parsing
 import configparser
@@ -13,11 +15,23 @@ import domain_status
 configFile = 'test.conf'
 
 def handleCommands(sock, domainList, config) -> None:
+    def stopHandler(signum, frame):
+        sock.close()
+        try:
+            client_sock.close()
+        except OSError:
+            pass
+        domain_status.closeHypervisor()
+        print("server down")
+        quit()
+
     working = True
     counter = 0
+    lastCmd = time.clock()
 
+    signal.signal(signal.SIGTERM, stopHandler)
     while working:
-        print("waiting for cmd...")
+        #print("waiting for cmd...")
         #get data from request
         (client_sock, address) = sock.accept();
         try:
@@ -31,10 +45,22 @@ def handleCommands(sock, domainList, config) -> None:
 
         if len(data) == 0:
             print("Wrong packet data")
+            client_sock.close()
             continue
 
         client_sock.settimeout(5)
         cmd = data[0]
+
+        #return full minutes from last command
+        if cmd == sockets.LASTCMD and sock.getsockname()[0] == address[0]:
+            now = time.clock()
+            absenceMinutes = int((now - lastCmd)/60)
+            try:
+                sockets.writeSocket(client_sock, (chr(sockets.LASTCMD) + absenceMinutes).encode("utf-8"))
+            except socket.timeout as err:
+                print (f'Timeout exceeded when trying to send LASTCMD data to', address[0])
+            client_sock.close()
+            continue
 
         #mark domain as occupied
         if cmd == sockets.CONNECT:           
@@ -75,8 +101,16 @@ def handleCommands(sock, domainList, config) -> None:
         else:
             print ("Wrong packet from", address, "data:", data)
         client_sock.close()
+        lastCmd = time.clock()
+
 
 def main():
+    def reloadHandler(signum, frame):
+        config.read(configFile)
+        temp = xml_parsing.importDomains(config['VIRTUALIZATION']['VMS_XML_PATH'])
+        domain_status.changeToNewDomains(domainList, temp)
+
+    signal.signal(signal.SIGHUP, reloadHandler)
     config = configparser.ConfigParser()
     #defaultConfig(config)
     config.read(configFile)

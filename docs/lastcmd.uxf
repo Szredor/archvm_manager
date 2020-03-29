@@ -9,7 +9,7 @@
       <w>150</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>'a', OK
+    <panel_attributes>'a', minutes
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -54,7 +54,7 @@
       <w>100</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>client</panel_attributes>
+    <panel_attributes>admin</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -87,7 +87,7 @@
       <w>130</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>'h', domain name
+    <panel_attributes>'a'
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -99,7 +99,8 @@
       <w>100</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>Heartbeat</panel_attributes>
+    <panel_attributes>LastCMD
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -110,8 +111,8 @@
       <w>160</w>
       <h>40</h>
     </coordinates>
-    <panel_attributes>Find domain and
-zero heartbeat counter
+    <panel_attributes>Check time
+and compute minutes
 </panel_attributes>
     <additional_attributes/>
   </element>

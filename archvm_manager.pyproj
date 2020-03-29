@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{ee99c455-c19e-4e0a-9748-e3a76f226fc5}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>client.py</StartupFile>
+    <StartupFile>shutdown_tester.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -13,6 +13,8 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId />
     <IsWindowsApplication>False</IsWindowsApplication>
+    <CommandLineArguments>15 192.168.0.146 17568</CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -30,6 +32,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="domain_status.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="shutdown_tester.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="sockets.py">

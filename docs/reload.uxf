@@ -4,22 +4,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>360</x>
-      <y>320</y>
-      <w>150</w>
-      <h>30</h>
-    </coordinates>
-    <panel_attributes>'a', OK
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
       <x>180</x>
       <y>140</y>
       <w>20</w>
-      <h>310</h>
+      <h>230</h>
     </coordinates>
     <panel_attributes/>
     <additional_attributes/>
@@ -30,7 +18,7 @@
       <x>670</x>
       <y>140</y>
       <w>20</w>
-      <h>320</h>
+      <h>230</h>
     </coordinates>
     <panel_attributes/>
     <additional_attributes/>
@@ -54,7 +42,7 @@
       <w>100</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>client</panel_attributes>
+    <panel_attributes>admin</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -69,17 +57,6 @@
     <additional_attributes>10.0;90.0;480.0;10.0</additional_attributes>
   </element>
   <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>190</x>
-      <y>300</y>
-      <w>500</w>
-      <h>140</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
-    <additional_attributes>480.0;120.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
     <id>UMLClass</id>
     <coordinates>
       <x>380</x>
@@ -87,7 +64,7 @@
       <w>130</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>'h', domain name
+    <panel_attributes>'l'
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -99,7 +76,8 @@
       <w>100</w>
       <h>30</h>
     </coordinates>
-    <panel_attributes>Heartbeat</panel_attributes>
+    <panel_attributes>Reload
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -108,22 +86,31 @@
       <x>20</x>
       <y>250</y>
       <w>160</w>
-      <h>40</h>
+      <h>30</h>
     </coordinates>
-    <panel_attributes>Find domain and
-zero heartbeat counter
-</panel_attributes>
+    <panel_attributes>Read config file</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>400</x>
-      <y>450</y>
+      <x>390</x>
+      <y>220</y>
       <w>100</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>Close Socket</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>20</x>
+      <y>310</y>
+      <w>160</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Create new domain list</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>

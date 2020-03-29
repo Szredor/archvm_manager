@@ -12,6 +12,7 @@ HEARTBEAT = ord('h')
 REFRESH = ord('r')
 RELOAD = ord('l')
 STOP = ord('s')
+LASTCMD = ord('a')
 
 def readSocket(sock, bufSize = 1024) -> b'':
     #get size of payload
