@@ -115,7 +115,8 @@ def main():
     #defaultConfig(config)
     config.read(configFile)
     domainList = xml_parsing.importDomains(config['VIRTUALIZATION']['VMS_XML_PATH'])
-    domain_status.prepareToWork(domainList, config)
+    if not domain_status.prepareToWork(domainList, config):
+        quit()
     domain_status.updateDomainsStatus(domainList)
     
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -6,7 +6,7 @@ import socket
 
 import xml_parsing
 import sockets
-#import libvirt
+import libvirt
 
 HEARTBEATS_LOSS = 3
 HEARTBEAT_CYCLE = 60
@@ -22,8 +22,8 @@ class HypervisorConnect():
     def __conn_hypervisor(self, driver):
     #connects with driver
         try:
-            #conn = libvirt.open(driver)
-            conn = libvirt.open("test:///default")
+            conn = libvirt.open(driver)
+            #conn = libvirt.open("test:///default")
             return conn
         except libvirt.libvirtError as e:
             print("Cannot connect to hypervisor", driver)
@@ -68,7 +68,7 @@ def heartbeatIncrementWorker(domainsStatus, domainsLock):
 #Intilizes connection with hypervisor, create heartbeat thread and creates lock
 #Returns True on success, False otherwise. 
 def prepareToWork(domainsStatus, config) -> bool:
-    #global hyper
+    global hyper
     global domainsLock
 
     hyper = HypervisorConnect(config['VIRTUALIZATION']['HYPERVISOR_URI'])
@@ -121,6 +121,8 @@ def markNotUsing(dom) -> bool:
             
 
 def updateDomainsStatus(domainList) -> None:
+    global domainsLock
+
     domainsLock.acquire()
     for dom in domainList:
         dom.status.isRunning = hyper.check_running(dom.name)
