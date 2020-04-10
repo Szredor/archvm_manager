@@ -62,8 +62,25 @@ def clientPrint(domainList):
         print("List of domains is empty.")
         return
 
-    #TODO: change print format
-    xml_parsing.printdomainList(domainList)
+    for i in range(0,len(domainList)):
+        print(f'{i+1}.', end='')
+        if domainList[i].isGaming:
+            print ('== GAMING == ', end='')
+        else:
+            print ('=== WORK === ', end='')
+        print(f' {domainList[i].name} ', end='')
+        if domainList[i].status.isRunning:
+            print ('!!!')
+        else:
+            print ('zzz...')
+
+        print(f'  Desciption: {domainList[i].description}')
+        print(f'  Address: {domainList[i].description}')
+
+        if not domainList[i].status.occupied:
+            print('  READY TO USE')
+        else:
+            print(f'  OCCUPIED: {domainList[i].status.owner}')
 
 def useDomain(domainData, config, threadData):
     if client_messages.connectMessage(domainData.name, config["COMMUNICATION"]["SERVER_IP"], int(config["COMMUNICATION"]["PORT"]), int(config["COMMUNICATION"]["BUF_SIZE"])):
@@ -89,8 +106,8 @@ def main():
     #sockets.WakeOnLan(config["WAKEONLAN"]["SERVER_MAC"], config["WAKEONLAN"]["BROADCAST_ADDRESS"], int(config["WAKEONLAN"]["WOL_PORT"]))
     #start heartbeat daemon
     heartbeatData = thread_data(int(config["COMMUNICATION"]["BUF_SIZE"]))
-    #th = threading.Thread(target=heartbeatThread, args=(heartbeatData, ), daemon=True)
-    #th.start()
+    th = threading.Thread(target=heartbeatThread, args=(heartbeatData, ), daemon=True)
+    th.start()
 
     domainList = client_messages.refreshMessage(config["COMMUNICATION"]["SERVER_IP"], int(config["COMMUNICATION"]["PORT"]), int(config["COMMUNICATION"]["BUF_SIZE"]))
     if domainList == None:
