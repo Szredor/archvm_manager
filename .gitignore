@@ -6,7 +6,8 @@
 #VisualStudio Python project files
 .sln
 .pyproj
-[__]pycache__/
+__pycache__/
+.vscode/launch.json
 
 # User-specific files
 *.rsuser

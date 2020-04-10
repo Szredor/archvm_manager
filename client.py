@@ -6,7 +6,7 @@ import threading
 import time
 import signal
 import sys
-sys.path.append("common")
+sys.path.append("./common/")
 
 import xml_parsing
 import sockets
@@ -89,8 +89,8 @@ def main():
     #sockets.WakeOnLan(config["WAKEONLAN"]["SERVER_MAC"], config["WAKEONLAN"]["BROADCAST_ADDRESS"], int(config["WAKEONLAN"]["WOL_PORT"]))
     #start heartbeat daemon
     heartbeatData = thread_data(int(config["COMMUNICATION"]["BUF_SIZE"]))
-    th = threading.Thread(target=heartbeatThread, args=(heartbeatData, ), daemon=True)
-    th.start()
+    #th = threading.Thread(target=heartbeatThread, args=(heartbeatData, ), daemon=True)
+    #th.start()
 
     domainList = client_messages.refreshMessage(config["COMMUNICATION"]["SERVER_IP"], int(config["COMMUNICATION"]["PORT"]), int(config["COMMUNICATION"]["BUF_SIZE"]))
     if domainList == None:

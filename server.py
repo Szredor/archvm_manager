@@ -6,7 +6,7 @@ import socket
 import signal
 import time
 import sys
-sys.path.append("common")
+sys.path.append("./common")
 
 import xml_parsing
 import configparser
@@ -28,8 +28,7 @@ def handleCommands(sock, domainList, config) -> None:
         quit()
 
     working = True
-    counter = 0
-    lastCmd = time.clock()
+    lastCmd = time.time()
 
     signal.signal(signal.SIGTERM, stopHandler)
     while working:
@@ -48,7 +47,9 @@ def handleCommands(sock, domainList, config) -> None:
         except RuntimeError as err:
             print (err)
             continue
-        
+        except socket.timeout:
+            print("Connection from", address, "timed out")
+            continue
 
         if len(data) == 0:
             print("Wrong packet data")
@@ -60,7 +61,7 @@ def handleCommands(sock, domainList, config) -> None:
 
         #return full minutes from last command
         if cmd == sockets.LASTCMD and sock.getsockname()[0] == address[0]:
-            now = time.clock()
+            now = time.time()
             absenceMinutes = int((now - lastCmd)/60)
             try:
                 sockets.writeSocket(client_sock, (chr(sockets.LASTCMD) + absenceMinutes).encode("utf-8"))
@@ -108,7 +109,7 @@ def handleCommands(sock, domainList, config) -> None:
         else:
             print ("Wrong packet from", address, "data:", data)
         client_sock.close()
-        lastCmd = time.clock()
+        lastCmd = time.time()
 
 
 def main():
@@ -116,6 +117,7 @@ def main():
         config.read(configFile)
         temp = xml_parsing.importDomains(config['VIRTUALIZATION']['VMS_XML_PATH'])
         domain_status.changeToNewDomains(domainList, temp)
+        print("Configuration file has been reloaded.")
 
     signal.signal(signal.SIGHUP, reloadHandler)
     config = configparser.ConfigParser()

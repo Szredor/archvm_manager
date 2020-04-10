@@ -5,7 +5,7 @@ import time
 import socket
 import libvirt
 import sys
-sys.path.append("common")
+sys.path.append("./common")
 
 import xml_parsing
 import sockets
@@ -19,7 +19,7 @@ class HypervisorConnect():
         if self.__conn is None:
             self.__criticalError = True
         else:
-            self.__criticalError = True
+            self.__criticalError = False
 
     def __conn_hypervisor(self, driver):
     #connects with driver
@@ -36,7 +36,8 @@ class HypervisorConnect():
         try:
             dom = self.__conn.lookupByName(name)
             ID = dom.ID()
-            if ID == -1: return False
+            if ID == -1: 
+                return False
             return True
         except libvirt.libvirtError as e:
             return False
@@ -128,7 +129,6 @@ def updateDomainsStatus(domainList) -> None:
     domainsLock.acquire()
     for dom in domainList:
         dom.status.isRunning = hyper.check_running(dom.name)
-        pass
     domainsLock.release()
 
 

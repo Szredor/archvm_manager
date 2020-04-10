@@ -3,12 +3,10 @@
 import subprocess
 import socket
 import sys
-sys.path.append("common")
+sys.path.append("./common")
 
 import sockets
 import xml_parsing
-
-TIMEOUT = 5
 
 def printHelp() -> None:
     print("Type number of machine to connect with.")
@@ -20,105 +18,97 @@ def printError(text) -> None:
     print (f'ERROR: {text}')
 
 def connectMessage(name, address, port, bufSize) -> bool:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        sock.connect((address,port))
-    except ConnectionRefusedError as err:
-        printError(f'Connection to {address} refused')
+    sock = sockets.create_connected_socket(address, port)
+    if sock is None:
         return False
     
-    sock.settimeout(TIMEOUT)
+    result = True
     try:
         sockets.writeSocket(sock, (chr(sockets.CONNECT) + name).encode(encoding='utf-8'))
         data = sockets.readSocket(sock, bufSize).decode(encoding='utf-8')
         if data[0] == sockets.ERROR:
             printError(data[1:])
-            return False
-        return True
+            result = False
     except socket.timeout:
         printError(f"Connection timed out")
-        return False
+        result = False
     except ConnectionResetError as err:
         printError(f"Connection from {address} reset")
-        return False
+        result = False
     except RuntimeError as err:
         printError (err)
-        return False
-    pass
+        result = False
+    finally:
+        sock.close()
+    return result
 
 def disconnectMessage(name, address, port, bufSize) -> bool:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        sock.connect((address,port))
-    except ConnectionRefusedError as err:
-        printError(f'Connection to {address} refused')
+    sock = sockets.create_connected_socket(address, port)
+    if sock is None:
         return False
     
-    sock.settimeout(TIMEOUT)
+    result = True
     try:
         sockets.writeSocket(sock, (chr(sockets.DISCONNECT) + name).encode(encoding='utf-8'))
         data = sockets.readSocket(sock, bufSize).decode(encoding='utf-8')
         if data[0] == sockets.ERROR:
             printError(data[1:])
-            return False
-        return True
+            result = False
     except socket.timeout:
         printError(f"Connection timed out")
-        return False
+        result = False
     except ConnectionResetError as err:
         printError(f"Connection from {address} reset")
-        return False
+        result = False
     except RuntimeError as err:
         printError (err)
-        return False
-    pass
+        result = False
+    finally:
+        sock.close()
+    return result
 
 def heartbeatMessage(name, address, port, bufSize) -> bool:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        sock.connect((address,port))
-    except ConnectionRefusedError as err:
+    sock = sockets.create_connected_socket(address, port)
+    if sock is None:
         return False
     
-    sock.settimeout(TIMEOUT)
+    result = True
     try:
         sockets.writeSocket(sock, (chr(sockets.HEARTBEAT) + name).encode(encoding='utf-8'))
         data = sockets.readSocket(sock, bufSize).decode(encoding='utf-8')
         if data[0] == sockets.ERROR:
             printError(data[1:])
-            return False 
-        return True
+            result = False 
     except socket.timeout:
-        return False
+        result = False
     except ConnectionResetError as err:
-        return False
+        result = False
     except RuntimeError as err:
-        return False
-    pass
+        result = False
+    finally:
+        sock.close()
+    return result
 
 def refreshMessage(address, port, bufSize) -> [xml_parsing.Domain]:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        sock.connect((address,port))
-    except ConnectionRefusedError as err:
-        printError(f'Connection to {address} refused')
+    sock = sockets.create_connected_socket(address, port)
+    if sock is None:
         return None
     
-    sock.settimeout(TIMEOUT)
+    result = None
     try:
         sockets.writeSocket(sock, (chr(sockets.REFRESH)).encode(encoding='utf-8'))
         data = sockets.readSocket(sock, bufSize).decode(encoding='utf-8')
-        return xml_parsing.importDomainsFromString(data[1:])
+        result = xml_parsing.importDomainsFromString(data[1:])
     except socket.timeout:
         printError(f"Connection timed out")
-        return None
     except ConnectionResetError as err:
         printError(f"Connection from {address} reset")
-        return None
     except RuntimeError as err:
         printError (err)
-        return []
-    pass
+        result = []
+    finally:
+        sock.close()
+    return result
 
 def runMoonlight(address, path) -> int:
     processStatus = subprocess.run([path])

@@ -14,8 +14,28 @@ RELOAD = ord('l')
 STOP = ord('s')
 LASTCMD = ord('a')
 
+TIMEOUT = 5
+
+def create_connected_socket(address, port) -> socket.socket:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(TIMEOUT)
+    try:
+        sock.connect((address,port))
+    except ConnectionRefusedError as err:
+        print(f'Error: Connection to {address}:{port} refused')
+        sock.close()
+        return None
+    except socket.timeout as err:
+        print (f"Error: Connection to {address}:{port} timed out.")
+        sock.close()
+        return None
+    
+    return sock
+
+
 def readSocket(sock, bufSize = 1024) -> b'':
     #get size of payload
+    sock.settimeout(TIMEOUT)
     bytes_length = sock.recv(4)
     msgsize = struct.unpack('!I', bytes_length)[0]
     received = 0
@@ -23,9 +43,7 @@ def readSocket(sock, bufSize = 1024) -> b'':
 
     #Read data in chunks until whole message pass
     while received < msgsize:
-        try:
-            chunk = sock.recv(min(bufSize, msgsize - received))
-        ex
+        chunk = sock.recv(min(bufSize, msgsize - received))
         if chunk == b'':
             raise RuntimeError('Socket connection broken')
         chunks.append(chunk)
@@ -38,6 +56,7 @@ def readSocket(sock, bufSize = 1024) -> b'':
     return b''.join(chunks)
 
 def writeSocket(sock, data) -> int:
+    sock.settimeout(TIMEOUT)
     msgsize = len(data)
     payload = struct.pack('!I', msgsize) + data
     #send all data to other side

@@ -16,8 +16,10 @@ def readSocket(sock, bufSize = 1024) -> bytes:
             chunk = sock.recv(min(bufSize, msgsize - received))
         except InterruptedError as e:
             print (e)
+            print (e.__class__)
         except Exception as e:
             print (e)
+            print (e.__class__)
 
         if chunk == b'':
             raise RuntimeError('Socket connection broken')

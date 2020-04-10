@@ -14,6 +14,26 @@
 
 -->
 <domains>
+	<gaming>
+		<name>g0</name>
+		<description>Gaming session with gtx 1060. </description>
+		<address>10.0.10.80</address>
+		<status occupied="0">
+			<owner></owner>
+			<is-running>0</is-running>
+			<!-- heartbeats inside server! -->
+		</status>
+	</gaming>
+	<gaming>
+		<name>g1</name>
+		<description>Gaming session with gtx 970. </description>
+		<address>10.0.10.81</address>
+		<status occupied="0">
+			<owner></owner>
+			<is-running>0</is-running>
+			<!-- heartbeats inside server! -->
+		</status>
+	</gaming>
 	<work>
 		<name>win10-psm</name>
 		<description>Work session configured for PSM. Prepared for conference.</description>

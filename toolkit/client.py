@@ -3,7 +3,7 @@
 import socket
 from readWrite import *
 
-IP = "192.168.0.146"
+IP = "10.0.10.92"
 PORT = 17568
 BUF_SIZE = 64
 data = ''
