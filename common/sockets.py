@@ -23,7 +23,9 @@ def readSocket(sock, bufSize = 1024) -> b'':
 
     #Read data in chunks until whole message pass
     while received < msgsize:
-        chunk = sock.recv(min(bufSize, msgsize - received))
+        try:
+            chunk = sock.recv(min(bufSize, msgsize - received))
+        ex
         if chunk == b'':
             raise RuntimeError('Socket connection broken')
         chunks.append(chunk)

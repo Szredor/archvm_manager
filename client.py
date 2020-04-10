@@ -6,9 +6,10 @@ import threading
 import time
 import signal
 import sys
+sys.path.append("common")
 
-import sockets
 import xml_parsing
+import sockets
 import client_messages
 
 config_file = 'archvm_manager.conf'
@@ -52,7 +53,6 @@ def heartbeatThread(heartbeatData):
             client_messages.heartbeatMessage(name, ip, port, heartbeatData.bufSize)
         heartbeatData.mutex.release()
 
-#TODO: change print format
 def clientPrint(domainList):
     if domainList is None:
         print("List of domains doesn't exist.")
@@ -62,6 +62,7 @@ def clientPrint(domainList):
         print("List of domains is empty.")
         return
 
+    #TODO: change print format
     xml_parsing.printdomainList(domainList)
 
 def useDomain(domainData, config, threadData):
@@ -80,7 +81,6 @@ def useDomain(domainData, config, threadData):
 
     return True
     
-
 def main():
     working = True
     config = configparser.ConfigParser()

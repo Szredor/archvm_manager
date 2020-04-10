@@ -5,6 +5,8 @@
 import socket
 import signal
 import time
+import sys
+sys.path.append("common")
 
 import xml_parsing
 import configparser
@@ -33,7 +35,11 @@ def handleCommands(sock, domainList, config) -> None:
     while working:
         #print("waiting for cmd...")
         #get data from request
-        (client_sock, address) = sock.accept();
+        try:
+            (client_sock, address) = sock.accept()
+        except InterruptedError:
+            continue
+
         try:
             data = sockets.readSocket(client_sock, int(config['COMMUNICATION']['BUF_SIZE']))
         except ConnectionResetError as err:
@@ -42,6 +48,7 @@ def handleCommands(sock, domainList, config) -> None:
         except RuntimeError as err:
             print (err)
             continue
+        
 
         if len(data) == 0:
             print("Wrong packet data")

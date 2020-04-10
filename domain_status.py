@@ -3,10 +3,12 @@
 import threading
 import time
 import socket
+import libvirt
+import sys
+sys.path.append("common")
 
 import xml_parsing
 import sockets
-import libvirt
 
 HEARTBEATS_LOSS = 3
 HEARTBEAT_CYCLE = 60
