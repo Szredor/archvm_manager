@@ -118,5 +118,5 @@ def runMoonlight(address, path) -> int:
     return processStatus
 
 def runRDP(address, path) -> int:
-    processStatus = os.system(f'{path} /v:{address}')
+    processStatus = os.system(f'start /wait {path} /v:{address}')
     return processStatus
