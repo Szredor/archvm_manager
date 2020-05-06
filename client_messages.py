@@ -25,9 +25,9 @@ def connectMessage(name, address, port, bufSize) -> bool:
     result = True
     try:
         sockets.writeSocket(sock, (chr(sockets.CONNECT) + name).encode(encoding='utf-8'))
-        data = sockets.readSocket(sock, bufSize).decode(encoding='utf-8')
+        data = sockets.readSocket(sock, bufSize)
         if data[0] == sockets.ERROR:
-            printError(data[1:])
+            printError(data.decode(encoding='utf-8')[1:])
             result = False
     except socket.timeout:
         printError(f"Connection timed out")
@@ -50,9 +50,9 @@ def disconnectMessage(name, address, port, bufSize) -> bool:
     result = True
     try:
         sockets.writeSocket(sock, (chr(sockets.DISCONNECT) + name).encode(encoding='utf-8'))
-        data = sockets.readSocket(sock, bufSize).decode(encoding='utf-8')
+        data = sockets.readSocket(sock, bufSize)
         if data[0] == sockets.ERROR:
-            printError(data[1:])
+            printError(data.decode(encoding='utf-8')[1:])
             result = False
     except socket.timeout:
         printError(f"Connection timed out")
@@ -75,9 +75,9 @@ def heartbeatMessage(name, address, port, bufSize) -> bool:
     result = True
     try:
         sockets.writeSocket(sock, (chr(sockets.HEARTBEAT) + name).encode(encoding='utf-8'))
-        data = sockets.readSocket(sock, bufSize).decode(encoding='utf-8')
+        data = sockets.readSocket(sock, bufSize)
         if data[0] == sockets.ERROR:
-            printError(data[1:])
+            printError(data.decode(encoding='utf-8')[1:])
             result = False 
     except socket.timeout:
         result = False

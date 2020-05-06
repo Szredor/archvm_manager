@@ -21,12 +21,12 @@
 		<status occupied="0">
 			<owner></owner>
 			<is-running>0</is-running>
-			<!-- heartbeats inside server! -->
+			<!--heartbeats inside server! -->
 		</status>
 	</gaming>
 	<gaming>
 		<name>win-gaming-1</name>
-		<description>Gaming session with gtx 970. </description>
+		<description>Gaming session with gtx 1060. </description>
 		<address>10.0.10.81</address>
 		<status occupied="0">
 			<owner></owner>
