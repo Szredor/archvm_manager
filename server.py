@@ -21,8 +21,9 @@ def handleCommands(sock, domainList, config) -> None:
         sock.close()
         try:
             client_sock.close()
-        except OSError:
+        except:
             pass
+
         domain_status.closeHypervisor()
         print("server down")
         quit()

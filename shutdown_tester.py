@@ -78,6 +78,7 @@ def main():
         sock.close()
     
     #shutdown machine
+    print (f'Nieaktywne od: {inactivityTime}')
     if dataRead and inactivityTime >= maxInactivity:
         os.system("shutdown now")
 
