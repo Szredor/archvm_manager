@@ -14,6 +14,7 @@
 
 -->
 <domains>
+<!--
 	<gaming>
 		<name>g0</name>
 		<description>Gaming session with gtx 1060. </description>
@@ -21,9 +22,10 @@
 		<status occupied="0">
 			<owner></owner>
 			<is-running>0</is-running>
-			<!-- heartbeats inside server! -->
+			 heartbeats inside server! 
 		</status>
 	</gaming>
+	-->
 	<gaming>
 		<name>g1</name>
 		<description>Gaming session with gtx 970. </description>

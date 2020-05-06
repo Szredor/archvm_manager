@@ -144,7 +144,6 @@ def connectHandle(data, domainList, sock, owner) -> str:
         domainsLock.release()
         return f'Domain {name} does not exist'
 
-    dom.status.isRunning = True
     if not dom.status.isRunning:
         domainsLock.release()
         return f'Domain {name} does not work'
