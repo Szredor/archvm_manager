@@ -64,7 +64,7 @@ def handleCommands(sock, domainList, config) -> None:
             now = time.time()
             absenceMinutes = int((now - lastCmd)/60)
             try:
-                sockets.writeSocket(client_sock, (chr(sockets.LASTCMD) + str(absenceMinutes)).encode("utf-8"))
+                sockets.writeSocket(client_sock, (chr(sockets.LASTCMD) + absenceMinutes).encode("utf-8"))
             except socket.timeout as err:
                 print (f'Timeout exceeded when trying to send LASTCMD data to', address[0])
             client_sock.close()

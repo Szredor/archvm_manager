@@ -63,7 +63,7 @@ def main():
     dataRead = False
     try:
         writeSocket(sock, chr(LASTCMD).encode(encoding='utf-8'))
-        data = readSocket(sock)
+        #data = readSocket(sock)
         if data[0] != LASTCMD:
             raise RuntimeError("Wrong command from server.")
         inactivityTime = int(data[1:].decode(encoding='utf-8'))
