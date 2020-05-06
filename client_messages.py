@@ -3,6 +3,7 @@
 import subprocess
 import socket
 import sys
+import os
 sys.path.append("./common")
 
 import sockets
@@ -111,11 +112,11 @@ def refreshMessage(address, port, bufSize) -> [xml_parsing.Domain]:
     return result
 
 def runMoonlight(address, path) -> int:
-    processStatus = subprocess.run([path])
+    processStatus = os.system(path)
     #processStatus = subprocess.run([path, 'stream', address, 'mstsc.exe'])
     #processStatus = subprocess.run([path, 'quit', 'address'])
-    return processStatus.returncode
+    return processStatus
 
 def runRDP(address, path) -> int:
-    processStatus = subprocess.run([path, f'/v:{address}'])
-    return processStatus.returncode
+    processStatus = os.system(f'{path} /v:{address}')
+    return processStatus

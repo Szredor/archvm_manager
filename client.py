@@ -75,7 +75,7 @@ def clientPrint(domainList):
             print ('zzz...')
 
         print(f'  Desciption: {domainList[i].description}')
-        print(f'  Address: {domainList[i].description}')
+        print(f'  Address: {domainList[i].address}')
 
         if not domainList[i].status.occupied:
             print('  READY TO USE')
@@ -111,7 +111,7 @@ def main():
 
     domainList = client_messages.refreshMessage(config["COMMUNICATION"]["SERVER_IP"], int(config["COMMUNICATION"]["PORT"]), int(config["COMMUNICATION"]["BUF_SIZE"]))
     if domainList == None:
-                sockets.WakeOnLan(config["WAKEONLAN"]["SERVER_MAC"], config["WAKEONLAN"]["BROADCAST_ADDRESS"], int(config["WAKEONLAN"]["WOL_PORT"]))
+        sockets.WakeOnLan(config["WAKEONLAN"]["SERVER_MAC"], config["WAKEONLAN"]["BROADCAST_ADDRESS"], int(config["WAKEONLAN"]["WOL_PORT"]))
     clientPrint(domainList)
     client_messages.printHelp()
 
@@ -119,16 +119,22 @@ def main():
         print(">", end="")
         cmd = input()
 
+        if len(cmd) < 1:
+            continue
+
         #help command
         if cmd.startswith("help") or cmd.startswith("?"):
             client_messages.printHelp()
+        #exit command
         elif cmd.startswith("exit"):
             working = False
+        #refresh command
         elif cmd[0] == 'r' and len(cmd) == 1:
             domainList = client_messages.refreshMessage(config["COMMUNICATION"]["SERVER_IP"], int(config["COMMUNICATION"]["PORT"]), int(config["COMMUNICATION"]["BUF_SIZE"]))
             if domainList == None:
                 sockets.WakeOnLan(config["WAKEONLAN"]["SERVER_MAC"], config["WAKEONLAN"]["BROADCAST_ADDRESS"], int(config["WAKEONLAN"]["WOL_PORT"]))
             clientPrint(domainList)
+        #connect to chosen machine
         elif cmd[0].isnumeric():
             i = 1
             while len(cmd) > i and cmd[i].isnumeric():
