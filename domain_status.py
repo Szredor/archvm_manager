@@ -195,19 +195,19 @@ def heartbeatHandle(data, domainList, sock, owner) -> str:
     dom = getDomain(domainList, name)
     if dom is None:
         domainsLock.release()
-        return f'Domain {name} does not exist'
+        return f'Heartbeat - Domain {name} does not exist'
 
     if not dom.status.isRunning:
         domainsLock.release()
-        return f'Domain {name} does not work'
+        return f'Heartbeat - Domain {name} does not work'
 
     if not dom.status.occupied:
         domainsLock.release()
-        return f'Domain {name} is not occupied'
+        return f'Heartbeat - Domain {name} is not occupied'
 
     if not dom.status.owner == owner:
         domainsLock.release()
-        return f'Domain {name} is not your property'
+        return f'Heartbeat - Domain {name} is not your property'
 
     dom.status.heartbeatCounter = 0
     domainsLock.release()

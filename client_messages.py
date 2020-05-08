@@ -117,6 +117,7 @@ def runMoonlight(address, path) -> int:
     #processStatus = subprocess.run([path, 'quit', 'address'])
     return processStatus
 
+#Run RDP and wait for it.
 def runRDP(address, path) -> int:
     processStatus = os.system(f'powershell -Command Start-Process -FilePath mstsc.exe -ArgumentList "/v:{address}" -Wait')
     return processStatus
