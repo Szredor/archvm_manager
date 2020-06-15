@@ -122,7 +122,8 @@ def main():
             server_down = False
         except RuntimeError:
             sockets.WakeOnLan(config["WAKEONLAN"]["SERVER_MAC"], config["WAKEONLAN"]["BROADCAST_ADDRESS"], int(config["WAKEONLAN"]["WOL_PORT"]))
-            cmd = input("Press enter to try again. If you want to quit type exit and enter.")
+            print("Press enter to try again. If you want to quit type exit and enter.")
+            cmd = input()
             if cmd.startswith("exit"):
                 working = False
                 server_down = False
