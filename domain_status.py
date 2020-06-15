@@ -158,8 +158,10 @@ def handleHello(hello_path, sock):
     with open(hello_path) as f:
         content = f.readlines()
 
+    result = ''.join(content)[:-1]
+
     try:
-        sockets.writeSocket(sock, (chr(sockets.HELLO) + content).encode(encoding='utf-8'))
+        sockets.writeSocket(sock, (chr(sockets.HELLO) + result).encode(encoding='utf-8'))
     except socket.timeout as err:
         pass
 
@@ -251,7 +253,7 @@ def heartbeatHandle(data, domainList, sock, owner) -> str:
         pass
     return None
 
-def bootHandle(name, domainList, hyper, sock) -> str:
+def bootHandle(data, domainList, sock) -> str:
     name = data.decode(encoding='utf-8')
 
     domainsLock.acquire()
@@ -281,7 +283,7 @@ def bootHandle(name, domainList, hyper, sock) -> str:
     except socket.timeout as err:
         hyper.shutdown_domain(name)
 
-def shutdownHandle(name, domainList, hyper, sock) -> str:
+def shutdownHandle(data, domainList, sock) -> str:
     name = data.decode(encoding='utf-8')
 
     domainsLock.acquire()

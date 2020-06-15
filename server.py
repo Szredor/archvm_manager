@@ -13,8 +13,8 @@ import configparser
 import sockets
 import domain_status
 
-#configFile = '/etc/archvm_manager'
-configFile = 'test.conf'
+configFile = '/etc/archvm_manager.d/archvm_manager.conf'
+#configFile = 'test.conf'
 
 def handleCommands(sock, domainList, config) -> None:
     def stopHandler(signum, frame):
@@ -81,7 +81,7 @@ def handleCommands(sock, domainList, config) -> None:
             erText = domain_status.disconnectHandle(data[1:], domainList, client_sock, address[0])
             if not erText is None:
                 sockets.sendError(client_sock, erText)
-        #mark owner as alive
+        #mark ownerr as alive
         elif cmd == sockets.HEARTBEAT:
             erText = domain_status.heartbeatHandle(data[1:], domainList, client_sock, address[0])
             if not erText is None:
@@ -104,13 +104,13 @@ def handleCommands(sock, domainList, config) -> None:
             else:
                 print ("Wrong reload packet from", address, "data:", data)
         #ADMIN COMMAND - starts a given domain
-        if cmd == sockets.BOOT:           
-            erText = domain_status.bootHandle(data[1:], domainList, hyper, client_sock)
+        elif cmd == sockets.BOOT:           
+            erText = domain_status.bootHandle(data[1:], domainList, client_sock)
             if not erText is None:
                 sockets.sendError(client_sock, erText)
         #ADMIN COMMAND - shutdown given domain, even if is occupied
-        if cmd == sockets.SHUTDOWN:           
-            erText = domain_status.shutdownHandle(data[1:], domainList, hyper, client_sock)
+        elif cmd == sockets.SHUTDOWN:           
+            erText = domain_status.shutdownHandle(data[1:], domainList, client_sock)
             if not erText is None:
                 sockets.sendError(client_sock, erText)
         #stops server if and only if STOP command comes from server address

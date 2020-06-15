@@ -71,7 +71,7 @@ def main():
         return 
 
     clientPrint(domainList)
-    client_messages.printHelp()
+    client_messages.printAdminHelp()
 
     while working:
         print(">", end="")
