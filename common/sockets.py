@@ -9,10 +9,15 @@ CONNECT = ord('c')
 DISCONNECT = ord('d')
 ERROR = ord('e')
 HEARTBEAT = ord('h')
+HELLO = ord('o')
 REFRESH = ord('r')
 RELOAD = ord('l')
 STOP = ord('s')
 LASTCMD = ord('a')
+
+#ADMIN COMMANDS
+BOOT = ord('b')
+SHUTDOWN = ord('t')
 
 TIMEOUT = 5
 

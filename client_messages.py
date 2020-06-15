@@ -15,8 +15,39 @@ def printHelp() -> None:
     print("Type \"exit\" to quit.")
     print("Type \"help\" or ? for this message.")
 
+def printAdminHelp() -> None:
+    print("Type number of machine to change it state.")
+    print("Type r to refresh list od domains.")
+    print("Type \"exit\" to quit.")
+    print("Type \"help\" or ? for this message.")
+
 def printError(text) -> None:
     print (f'ERROR: {text}')
+
+def helloMessage(address, port, bufsize) -> bool:
+    sock = sockets.create_connected_socket(address, port)
+    if sock is None:
+        return False
+    
+    result = True
+    try:
+        sockets.writeSocket(sock, (chr(sockets.HELLO)).encode(encoding='utf-8'))
+        data = sockets.readSocket(sock, bufSize)
+        if data[0] != sockets.HELLO:
+            raise RuntimeError("Wrong HELLO packet received")
+        print(data.decode(encoding='utf-8')[1:])
+    except socket.timeout:
+        printError(f"Connection timed out")
+        result = False
+    except ConnectionResetError as err:
+        printError(f"Connection from {address} reset")
+        result = False
+    except RuntimeError as err:
+        printError (err)
+        result = False
+    finally:
+        sock.close()
+    return result
 
 def connectMessage(name, address, port, bufSize) -> bool:
     sock = sockets.create_connected_socket(address, port)
@@ -111,6 +142,56 @@ def refreshMessage(address, port, bufSize) -> [xml_parsing.Domain]:
         sock.close()
     return result
 
+def bootMessage(name, address, port, bufSize) -> bool:
+    sock = sockets.create_connected_socket(address, port)
+    if sock is None:
+        return False
+    
+    result = True
+    try:
+        sockets.writeSocket(sock, (chr(sockets.BOOT) + name).encode(encoding='utf-8'))
+        data = sockets.readSocket(sock, bufSize)
+        if data[0] == sockets.ERROR:
+            printError(data.decode(encoding='utf-8')[1:])
+            result = False
+    except socket.timeout:
+        printError(f"Connection timed out")
+        result = False
+    except ConnectionResetError as err:
+        printError(f"Connection from {address} reset")
+        result = False
+    except RuntimeError as err:
+        printError (err)
+        result = False
+    finally:
+        sock.close()
+    return result
+
+def shutdownMessage(name, address, port, bufSize) -> bool:
+    sock = sockets.create_connected_socket(address, port)
+    if sock is None:
+        return False
+    
+    result = True
+    try:
+        sockets.writeSocket(sock, (chr(sockets.SHUTDOWN) + name).encode(encoding='utf-8'))
+        data = sockets.readSocket(sock, bufSize)
+        if data[0] == sockets.ERROR:
+            printError(data.decode(encoding='utf-8')[1:])
+            result = False
+    except socket.timeout:
+        printError(f"Connection timed out")
+        result = False
+    except ConnectionResetError as err:
+        printError(f"Connection from {address} reset")
+        result = False
+    except RuntimeError as err:
+        printError (err)
+        result = False
+    finally:
+        sock.close()
+    return result
+
 def runMoonlight(address, path) -> int:
     processStatus = os.system(path)
     #processStatus = subprocess.run([path, 'stream', address, 'mstsc.exe'])
@@ -119,5 +200,5 @@ def runMoonlight(address, path) -> int:
 
 #Run RDP and wait for it.
 def runRDP(address, path) -> int:
-    processStatus = os.system(f'powershell -Command Start-Process -FilePath mstsc.exe -ArgumentList "/v:{address}" -Wait')
+    processStatus = os.system(f'powershell -Command Start-Process -FilePath {path} -ArgumentList "/v:{address}" -Wait')
     return processStatus

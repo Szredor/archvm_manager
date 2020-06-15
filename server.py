@@ -93,6 +93,8 @@ def handleCommands(sock, domainList, config) -> None:
                 sockets.writeSocket(client_sock, chr(sockets.REFRESH).encode(encoding='utf-8') + xml_parsing.createXmlMessage(domainList))
             except socket.timeout as err:
                 print (f'Timeout exceeded when trying to send REFRESH data to', address[0])
+        elif cmd == sockets.HELLO:
+            domain_status.handleHello(config['COMMUNICATION']['HELLO_TEXT_PATH'], client_sock)
         #reloads config file and imports domains from file
         elif cmd == sockets.RELOAD:
             if sock.getsockname()[0] == address[0]:
@@ -101,6 +103,16 @@ def handleCommands(sock, domainList, config) -> None:
                 domain_status.changeToNewDomains(domainList, temp)
             else:
                 print ("Wrong reload packet from", address, "data:", data)
+        #ADMIN COMMAND - starts a given domain
+        if cmd == sockets.BOOT:           
+            erText = domain_status.bootHandle(data[1:], domainList, hyper, client_sock)
+            if not erText is None:
+                sockets.sendError(client_sock, erText)
+        #ADMIN COMMAND - shutdown given domain, even if is occupied
+        if cmd == sockets.SHUTDOWN:           
+            erText = domain_status.shutdownHandle(data[1:], domainList, hyper, client_sock)
+            if not erText is None:
+                sockets.sendError(client_sock, erText)
         #stops server if and only if STOP command comes from server address
         elif cmd == sockets.STOP:
             if sock.getsockname()[0] == address[0]:

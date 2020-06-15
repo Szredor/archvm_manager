@@ -13,45 +13,6 @@ import sockets
 import client_messages
 
 config_file = 'archvm_manager.conf'
-HEARTBEAT_CYCLE = 60
-
-class thread_data():
-    def __init__(self, bufSize):
-        self._domainName = ""
-        self._serverAddress = ""
-        self._serverPort = 0
-        self.bufSize = bufSize
-
-        self.mutex = threading.Lock()
-        self.isUsing = False
-
-    def startUsing(self, name, serverAddress, serverPort):
-        self.mutex.acquire()
-        self._domainName = name
-        self._serverAddress = serverAddress
-        self._serverPort = serverPort
-        self.isUsing = True
-        self.mutex.release()
-
-    def stopUsing(self):
-        self.mutex.acquire()
-        self._domainName = ""
-        self._serverAddress = ""
-        self._serverPort = 0
-        self.isUsing = False
-        self.mutex.release()
-
-    def getHeartbeatData(self):
-        return (self._domainName, self._serverAddress, self._serverPort)
-
-def heartbeatThread(heartbeatData):
-    while True:
-        time.sleep(HEARTBEAT_CYCLE)
-        heartbeatData.mutex.acquire()
-        if heartbeatData.isUsing:
-            name, ip, port = heartbeatData.getHeartbeatData()
-            client_messages.heartbeatMessage(name, ip, port, heartbeatData.bufSize)
-        heartbeatData.mutex.release()
 
 def clientPrint(domainList):
     if domainList is None:
@@ -81,32 +42,11 @@ def clientPrint(domainList):
             print('  READY TO USE')
         else:
             print(f'  OCCUPIED: {domainList[i].status.owner}')
-
-def useDomain(domainData, config, threadData):
-    if client_messages.connectMessage(domainData.name, config["COMMUNICATION"]["SERVER_IP"], int(config["COMMUNICATION"]["PORT"]), int(config["COMMUNICATION"]["BUF_SIZE"])):
-        threadData.startUsing(domainData.name, config["COMMUNICATION"]["SERVER_IP"], int(config["COMMUNICATION"]["PORT"]))
-    else:
-        return True
-
-    if domainData.isGaming:
-        client_messages.runMoonlight(domainData.address, config['APPLICATIONS']['NVIDIA_CLIENT_PATH'])
-    else:
-        client_messages.runRDP(domainData.address, config['APPLICATIONS']['RDP_CLIENT_PATH'])
-
-    client_messages.disconnectMessage(domainData.name, config["COMMUNICATION"]["SERVER_IP"], int(config["COMMUNICATION"]["PORT"]), int(config["COMMUNICATION"]["BUF_SIZE"]))
-    threadData.stopUsing()
-
-    return True
     
 def main():
     working = True
     config = configparser.ConfigParser()
     config.read(config_file)
-
-    #start heartbeat daemon
-    heartbeatData = thread_data(int(config["COMMUNICATION"]["BUF_SIZE"]))
-    th = threading.Thread(target=heartbeatThread, args=(heartbeatData, ), daemon=True)
-    th.start()
 
     server_down = True
     while server_down:
@@ -122,12 +62,13 @@ def main():
             server_down = False
         except RuntimeError:
             sockets.WakeOnLan(config["WAKEONLAN"]["SERVER_MAC"], config["WAKEONLAN"]["BROADCAST_ADDRESS"], int(config["WAKEONLAN"]["WOL_PORT"]))
-            cmd = input("Press enter to try again. If you want to quit type exit and enter.")
-            if cmd.startswith("exit"):
+            print("Press enter to try again. If you want to quit type exit and enter.")
+            cmd = input()
+            if input.startswith("exit"):
                 working = False
                 server_down = False
     if not working:
-        return
+        return 
 
     clientPrint(domainList)
     client_messages.printHelp()
@@ -141,7 +82,7 @@ def main():
 
         #help command
         if cmd.startswith("help") or cmd.startswith("?"):
-            client_messages.printHelp()
+            client_messages.printAdminHelp()
         #exit command
         elif cmd.startswith("exit"):
             working = False
@@ -151,7 +92,7 @@ def main():
             if domainList == None:
                 sockets.WakeOnLan(config["WAKEONLAN"]["SERVER_MAC"], config["WAKEONLAN"]["BROADCAST_ADDRESS"], int(config["WAKEONLAN"]["WOL_PORT"]))
             clientPrint(domainList)
-        #connect to chosen machine
+        #change state of chosen machine
         elif cmd[0].isnumeric():
             i = 1
             while len(cmd) > i and cmd[i].isnumeric():
@@ -159,8 +100,10 @@ def main():
             num = int(cmd[0:i])
 
             if num > 0 and num <= len(domainList):
-                if not useDomain(domainList[num-1], config, heartbeatData):
-                    working = False
+                if domainList[num-1].status.isRunning:
+                    client_messages.shutdownMessage(domainList[num-1].name, config["COMMUNICATION"]["SERVER_IP"], int(config["COMMUNICATION"]["PORT"]), int(config["COMMUNICATION"]["BUF_SIZE"]))
+                else:
+                    client_messages.bootMessage(domainList[num-1].name, config["COMMUNICATION"]["SERVER_IP"], int(config["COMMUNICATION"]["PORT"]), int(config["COMMUNICATION"]["BUF_SIZE"]))
             else:
                 print("Wrong number of domain")
         else:

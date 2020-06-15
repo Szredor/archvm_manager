@@ -41,7 +41,7 @@ alt
     <id>UMLClass</id>
     <coordinates>
       <x>585</x>
-      <y>156</y>
+      <y>195</y>
       <w>26</w>
       <h>520</h>
     </coordinates>
@@ -52,7 +52,7 @@ alt
     <id>UMLClass</id>
     <coordinates>
       <x>1222</x>
-      <y>156</y>
+      <y>195</y>
       <w>26</w>
       <h>520</h>
     </coordinates>
@@ -63,7 +63,7 @@ alt
     <id>UMLClass</id>
     <coordinates>
       <x>533</x>
-      <y>91</y>
+      <y>130</y>
       <w>130</w>
       <h>39</h>
     </coordinates>
@@ -74,7 +74,7 @@ alt
     <id>UMLClass</id>
     <coordinates>
       <x>1183</x>
-      <y>78</y>
+      <y>117</y>
       <w>130</w>
       <h>39</h>
     </coordinates>
@@ -85,7 +85,7 @@ alt
     <id>Relation</id>
     <coordinates>
       <x>598</x>
-      <y>143</y>
+      <y>182</y>
       <w>650</w>
       <h>143</h>
     </coordinates>
@@ -96,7 +96,7 @@ alt
     <id>Relation</id>
     <coordinates>
       <x>598</x>
-      <y>364</y>
+      <y>403</y>
       <w>650</w>
       <h>182</h>
     </coordinates>
@@ -107,7 +107,7 @@ alt
     <id>UMLClass</id>
     <coordinates>
       <x>871</x>
-      <y>156</y>
+      <y>195</y>
       <w>130</w>
       <h>39</h>
     </coordinates>
@@ -119,7 +119,7 @@ alt
     <id>UMLClass</id>
     <coordinates>
       <x>819</x>
-      <y>390</y>
+      <y>429</y>
       <w>195</w>
       <h>39</h>
     </coordinates>
@@ -131,7 +131,7 @@ alt
     <id>UMLClass</id>
     <coordinates>
       <x>871</x>
-      <y>0</y>
+      <y>39</y>
       <w>130</w>
       <h>39</h>
     </coordinates>
@@ -143,7 +143,7 @@ alt
     <id>UMLClass</id>
     <coordinates>
       <x>377</x>
-      <y>299</y>
+      <y>338</y>
       <w>208</w>
       <h>52</h>
     </coordinates>
@@ -156,7 +156,7 @@ generate new XML
     <id>UMLClass</id>
     <coordinates>
       <x>1261</x>
-      <y>611</y>
+      <y>650</y>
       <w>169</w>
       <h>52</h>
     </coordinates>
@@ -168,7 +168,7 @@ and show status</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1261</x>
-      <y>546</y>
+      <y>585</y>
       <w>130</w>
       <h>39</h>
     </coordinates>

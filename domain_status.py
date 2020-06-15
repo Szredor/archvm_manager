@@ -40,6 +40,29 @@ class HypervisorConnect():
                 return False
             return True
         except libvirt.libvirtError as e:
+            print(e)
+            return False
+
+    def start_domain(self, name):
+        try:
+            dom = self.__conn.lookupByName(name)
+            if dom.ID() == -1: 
+                dom.create()
+                return True
+            return False
+        except libvirt.libvirtError as e:
+            print(e)
+            return False
+
+    def shutdown_domain(self, name):
+        try:
+            dom = self.__conn.lookupByName(name)
+            if dom.ID() > -1: 
+                dom.shutdown()
+                return True
+            return False
+        except libvirt.libvirtError as e:
+            print(e)
             return False
 
     def isCriticalError(self):
@@ -131,6 +154,15 @@ def updateDomainsStatus(domainList) -> None:
         dom.status.isRunning = hyper.check_running(dom.name)
     domainsLock.release()
 
+def handleHello(hello_path, sock):
+    with open(hello_path) as f:
+        content = f.readlines()
+
+    try:
+        sockets.writeSocket(sock, (chr(sockets.HELLO) + content).encode(encoding='utf-8'))
+    except socket.timeout as err:
+        pass
+
 
 #Checks conditions and mark as occupied if all are right
 #Returns str if error occured with error message. It is intented sending it to client.
@@ -157,6 +189,7 @@ def connectHandle(data, domainList, sock, owner) -> str:
     except socket.timeout as err:
         markNotUsing(dom)
     domainsLock.release()
+    return None
     
 #Checks conditions and mark as not occupied if all are right
 #Returns str if error occured with error message. It is intented sending it to client.
@@ -217,6 +250,66 @@ def heartbeatHandle(data, domainList, sock, owner) -> str:
     except socket.timeout as err:
         pass
     return None
+
+def bootHandle(name, domainList, hyper, sock) -> str:
+    name = data.decode(encoding='utf-8')
+
+    domainsLock.acquire()
+    dom = getDomain(domainList, name)
+    if dom is None:
+        domainsLock.release()
+        return f'Domain {name} does not exist.'
+
+    inside = dom.status.isRunning
+    outside = hyper.check_running(name)
+    domainsLock.release()
+
+    if outside == True and inside == True:
+         return f'Domain {name} is up, cannot boot.'
+
+    if outside != inside:
+        if outside:
+            return f'Domain {name} is down in hypervisor. If you really want to boot it up, refresh and try again, please.'
+        else:
+            return f'Domain {name} is already running but status has wrong information. Please refresh.'
+
+    if not hyper.start_domain(name):
+        return f'Domain {name} cannot be started.'
+
+    try:
+        sockets.writeSocket(sock, (chr(sockets.BOOT) + 'OK').encode(encoding='utf-8'))
+    except socket.timeout as err:
+        hyper.shutdown_domain(name)
+
+def shutdownHandle(name, domainList, hyper, sock) -> str:
+    name = data.decode(encoding='utf-8')
+
+    domainsLock.acquire()
+    dom = getDomain(domainList, name)
+    if dom is None:
+        domainsLock.release()
+        return f'Domain {name} does not exist.'
+
+    inside = dom.status.isRunning
+    outside = hyper.check_running(name)
+    domainsLock.release()
+
+    if outside == False and inside == False:
+        return f'Domain {name} is down, cannot shutdown.'
+    
+    if outside != inside:
+        if outside:
+            return f'Domain {name} is running in hypervisor. If you really want to shut it down, refresh and try again, please.'
+        else:
+            return f'Domain {name} is down in hypervisor. Please refresh.'
+
+    if not hyper.shutdown_domain(name):
+        return f'Domain {name} cannot be shuted down.'
+
+    try:
+        sockets.writeSocket(sock, (chr(sockets.SHUTDOWN) + 'OK').encode(encoding='utf-8'))
+    except socket.timeout as err:
+        hyper.start_domain(name)
 
 #Reloads data about virtual machines configured in XML file.
 #Copies status of every still exeisting domains.
