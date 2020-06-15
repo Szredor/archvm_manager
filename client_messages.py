@@ -24,7 +24,7 @@ def printAdminHelp() -> None:
 def printError(text) -> None:
     print (f'ERROR: {text}')
 
-def helloMessage(address, port, bufsize) -> bool:
+def helloMessage(address, port, bufSize) -> bool:
     sock = sockets.create_connected_socket(address, port)
     if sock is None:
         return False
