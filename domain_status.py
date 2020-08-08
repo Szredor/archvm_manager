@@ -307,6 +307,7 @@ def shutdownHandle(data, domainList, sock) -> str:
 
     if not hyper.shutdown_domain(name):
         return f'Domain {name} cannot be shuted down.'
+    dom.status.occupied = False
 
     try:
         sockets.writeSocket(sock, (chr(sockets.SHUTDOWN) + 'OK').encode(encoding='utf-8'))
