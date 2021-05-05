@@ -76,7 +76,7 @@ def printdomainList(domainList):
 def createXmlMessage(domainList):
     messageString = b'<?xml version="1.0" encoding="UTF-8"?>'
     messageBuilder = ET.TreeBuilder()
-    messageBuilder.start('domains')
+    messageBuilder.start('domains', {})
     for domain in domainList:
         if domain.isGaming:
             messageBuilder.start('gaming',{})
